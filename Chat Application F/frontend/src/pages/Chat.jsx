@@ -8,7 +8,7 @@ import styled from "styled-components";
 
 import { io } from "socket.io-client";
 
-import { allUsersRoute, host } from "../utils/APIRoutes";
+import { getAllFriendsRoute, host } from "../utils/APIRoutes";
 
 import Contact from "../components/Contact";
 import Welcome from "../components/Welcome";
@@ -47,17 +47,30 @@ function Chat() {
   }, [currentUser]);
 
   useEffect(() => {
-    const fetchContact = async () => {
+    const fetchFriends = async () => {
       if (currentUser) {
-        if (currentUser.isAvatarImageSet) {
-          const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
-          setContacts(data.data);
+        if (currentUser.isAvatarImageSet && currentUser.friends.length > 0) {
+          const friendsList = currentUser.friends.map((item) => item);
+          let data = [];
+          for (let i = 0; i < friendsList.length; i++) {
+            await axios
+              .get(`${getAllFriendsRoute}/${friendsList[i]}`)
+              .then((res) => {
+                const newItem = res.data;
+                data.push(newItem);
+                if (data.length === friendsList.length) {
+                  setContacts(data);
+                }
+              })
+              .catch((error) => console.log("Error"));
+          }
+          console.log(contacts);
         } else {
           navigate("/setAvatar");
         }
       }
     };
-    fetchContact();
+    fetchFriends();
   }, [currentUser]);
 
   const handleChatChange = (chat) => {

@@ -68,3 +68,48 @@ module.exports.getAllUsers = async (req, res, next) => {
     next(error);
   }
 };
+
+module.exports.addFriends = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const friendId = req.body._id;
+    const userData = await User.findById(userId);
+    const friendData = await User.findById(friendId);
+    if (!userData.friends.includes(friendId)) {
+      await userData.updateOne({ $push: { friends: friendId } });
+      await friendData.updateOne({ $push: { friends: userId } });
+      return res.json({ msg: "Added to your friends list !", status: true });
+    } else {
+      return res.json({ msg: "Already in your friends list !", status: false });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// module.exports.friendsList = async (req, res, next) => {
+//   try {
+//     const userId = req.params.id;
+//     const data = await User.findById(userId).select(["friends"]);
+//     data.friends.map(async (item) => {
+//       const details = await User.find({ _id: { $ne: item } }).select(["email"]);
+//       return res.json(details);
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+module.exports.friendsList = async (req, res, next) => {
+  try {
+    let userId = req.params.id;
+    const user = await User.findById(userId).select([
+      "username",
+      "avatarImage",
+      "_id",
+    ]);
+    return res.json(user);
+  } catch (error) {
+    next(error);
+  }
+};

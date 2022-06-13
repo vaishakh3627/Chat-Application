@@ -1,10 +1,14 @@
 import { React, useState, useEffect } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import styled from "styled-components";
 
 import Logo from "../assets/logo.svg";
 
 function Contact({ contacts, currentUser, changeChat }) {
+  const navigate = useNavigate();
+
   const [currentUserName, setCurrentUserName] = useState(undefined);
 
   const [currentUserImage, setCurrentUSerImage] = useState(undefined);
@@ -21,6 +25,10 @@ function Contact({ contacts, currentUser, changeChat }) {
   const changeCurrentChat = (index, contact) => {
     setCurrentSelected(index);
     changeChat(contact);
+  };
+
+  const handleAccount = () => {
+    navigate("/account");
   };
 
   return (
@@ -62,7 +70,9 @@ function Contact({ contacts, currentUser, changeChat }) {
               />
             </div>
             <div className="username">
-              <h2>{currentUserName}</h2>
+              <a onClick={handleAccount}>
+                <h2>{currentUserName}</h2>
+              </a>
             </div>
           </div>
         </Container>
@@ -144,6 +154,7 @@ const Container = styled.div`
     .username {
       h2 {
         color: white;
+        cursor: pointer;
       }
     }
     @media screen and (min-width: 720px) and (max-width: 1080px) {
